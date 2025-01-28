@@ -1,0 +1,72 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+
+title Weather Dashboard Class Diagram
+
+' Interfaces/abstract classes
+interface IWeatherAPIClient {
+  + get_weather_data(location: str, unit: str): WeatherData
+}
+
+interface ICacheManager {
+  + get_cached_data(location: str): WeatherData
+  + set_cached_data(location: str, data: WeatherData, ttl: int): void
+  + is_cache_valid(location: str): bool
+}
+
+' Data Model for weather
+class WeatherData {
+  - temperature: float
+  - feels_like: float
+  - humidity: float
+  - wind_speed: float
+  - condition: str
+  - sunrise: datetime
+  - sunset: datetime
+  - timezone: str
+  --
+  + to_dict(): dict
+}
+
+' Concrete class for API client
+class OpenWeatherMapClient implements IWeatherAPIClient {
+  - api_key: str
+  - base_url: str
+  --
+  + get_weather_data(location: str, unit: str): WeatherData
+}
+
+' Concrete class for cache management
+class InMemoryCacheManager implements ICacheManager {
+  - cache_store: dict
+  - default_ttl: int
+  --
+  + get_cached_data(location: str): WeatherData
+  + set_cached_data(location: str, data: WeatherData, ttl: int): void
+  + is_cache_valid(location: str): bool
+}
+
+' Controller (the "brain" of the application)
+class WeatherController {
+  - api_client: IWeatherAPIClient
+  - cache_manager: ICacheManager
+  --
+  + get_weather(location: str, unit: str = "metric"): WeatherData
+}
+
+' GUI / Web Frontend
+class WeatherGUI {
+  - controller: WeatherController
+  --
+  + display_weather_info(location: str, unit: str): void
+  + display_error_message(error: str): void
+}
+
+' Relationships
+WeatherController --> IWeatherAPIClient : uses
+WeatherController --> ICacheManager : uses
+WeatherGUI --> WeatherController : uses
+OpenWeatherMapClient ..> WeatherData : returns
+InMemoryCacheManager ..> WeatherData : stores
+@enduml
