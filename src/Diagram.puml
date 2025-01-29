@@ -14,7 +14,9 @@ interface ICacheManager {
   + set_cached_data(location: str, data: WeatherData, ttl: int): void
   + is_cache_valid(location: str): bool
 }
-
+class Skibidi{
+    - rizzy: fanum_tax
+}
 ' Data Model for weather
 class WeatherData {
   - temperature: float
